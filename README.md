@@ -9,7 +9,7 @@ and text steganography.
 | Folder | Topic |
 | --- | --- |
 | `L2/` | Shannon entropy of text (C#) |
-| `L3/` | Number theory helpers — GCD, modular arithmetic (C#) |
+| `L3/` | Number theory helpers, GCD and modular arithmetic (C#) |
 | `L4/` | Trithemius cipher and letter-frequency analysis |
 | `L5/` | Route transposition cipher and frequency histograms |
 | `L6/` | Enigma machine simulation |
@@ -18,7 +18,7 @@ and text steganography.
 | `L9/` | Merkle-Hellman knapsack cryptosystem, encryption/decryption timing |
 | `L10/` | Large-prime generation timing and RSA encryption |
 | `L11/` | SHA-256 hashing performance analyzer (Express app) |
-| `l12/` | Public-key primitives in JS — RSA, ElGamal, Schnorr signatures |
+| `l12/` | Public-key primitives in JS: RSA, ElGamal, Schnorr signatures |
 | `L13/` | Text steganography via kerning and line-length modification |
 
 Each folder is self-contained. Python labs use their own virtual environment,
@@ -50,7 +50,7 @@ dotnet build
 
 ## Not tracked in this repo
 
-- `.venv/` — Python virtual environments (recreate per lab)
-- `node_modules/` — run `npm install` in `L11`/`l12`
-- `bin/`, `obj/` — .NET build output
-- Lecture/practicum handouts (`pract.pdf`, course PDFs) — not my own work
+- `.venv/`: Python virtual environments, just recreate them per lab
+- `node_modules/`: run `npm install` in `L11`/`l12`
+- `bin/`, `obj/`: .NET build output
+- Lecture/practicum handouts (`pract.pdf`, course PDFs), since they're not my own work
