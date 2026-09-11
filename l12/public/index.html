@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>ЭЦП: RSA, Эль-Гамаль, Шнорр</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    textarea, input, select, button { width: 100%; margin: 0.5em 0; }
+    .result { background: #f0f0f0; padding: 1em; margin-top: 1em; }
+  </style>
+</head>
+<body>
+  <h1>ЭЦП: RSA, Эль-Гамаль, Шнорр</h1>
+  <label>Алгоритм:
+    <select id="algo">
+      <option value="rsa">RSA</option>
+      <option value="elgamal">Эль-Гамаль</option>
+      <option value="schnorr">Шнорр</option>
+    </select>
+  </label>
+  <button onclick="generateKeys()">Сгенерировать ключи</button>
+  <label>Открытый ключ:
+    <textarea id="publicKey" rows="4"></textarea>
+  </label>
+  <label>Закрытый ключ:
+    <textarea id="privateKey" rows="4"></textarea>
+  </label>
+  <label>Сообщение:
+    <textarea id="message" rows="2"></textarea>
+  </label>
+  <button onclick="signMessage()">Подписать</button>
+  <label>Подпись:
+    <textarea id="signature" rows="2"></textarea>
+  </label>
+  <button onclick="verifySignature()">Проверить подпись</button>
+  <div class="result" id="result"></div>
+  <script>
+    function getAlgo() {
+      return document.getElementById('algo').value;
+    }
+    function setResult(text) {
+      document.getElementById('result').innerText = text;
+    }
+    async function generateKeys() {
+      setResult('Генерация ключей...');
+      const res = await fetch(`/api/${getAlgo()}/generate`, { method: 'POST' });
+      const data = await res.json();
+      if (data.keys) {
+        document.getElementById('publicKey').value = JSON.stringify(data.keys.publicKey, null, 2);
+        document.getElementById('privateKey').value = JSON.stringify(data.keys.privateKey, null, 2);
+        setResult('Ключи сгенерированы за ' + data.ms.toFixed(2) + ' мс');
+      } else setResult('Ошибка: ' + data.error);
+    }
+    async function signMessage() {
+      setResult('Подпись...');
+      let privateKey;
+      try { privateKey = JSON.parse(document.getElementById('privateKey').value); } catch {
+        privateKey = document.getElementById('privateKey').value;
+      }
+      const message = document.getElementById('message').value;
+      const res = await fetch(`/api/${getAlgo()}/sign`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ privateKey, message })
+      });
+      const data = await res.json();
+      if (data.signature) {
+        document.getElementById('signature').value = typeof data.signature === 'string' ? data.signature : JSON.stringify(data.signature);
+        setResult('Подпись создана за ' + data.ms.toFixed(2) + ' мс');
+      } else setResult('Ошибка: ' + data.error);
+    }
+    async function verifySignature() {
+      setResult('Проверка подписи...');
+      let publicKey, signature;
+      try { publicKey = JSON.parse(document.getElementById('publicKey').value); } catch {
+        publicKey = document.getElementById('publicKey').value;
+      }
+      try { signature = JSON.parse(document.getElementById('signature').value); } catch {
+        signature = document.getElementById('signature').value;
+      }
+      const message = document.getElementById('message').value;
+      const res = await fetch(`/api/${getAlgo()}/verify`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ publicKey, message, signature })
+      });
+      const data = await res.json();
+      setResult((data.valid ? 'Подпись верна' : 'Подпись НЕВЕРНА') + (data.ms ? (', проверка заняла ' + data.ms.toFixed(2) + ' мс') : ''));
+    }
+  </script>
+</body>
+</html> 
