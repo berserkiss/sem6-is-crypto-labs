@@ -1,0 +1,28 @@
+# Python virtual environments (each lab has its own)
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Node dependencies
+node_modules/
+
+# .NET build output
+bin/
+obj/
+
+# IDE
+.idea/
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Lecture/practicum handouts - not my work
+pract.pdf
+лабораторный практикум ч2.pdf
+
+# OS/logs
+.DS_Store
+*.log
