@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Текстовая Стеганография</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 Текстовая Стеганография</h1>
+            <p>Скрытие информации в тексте через модификацию пространственно-геометрических параметров</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="kerning">Кернинг</button>
+            <button class="tab-btn" data-tab="line-length">Длина строки</button>
+        </div>
+
+        <div class="tab-content active" id="kerning">
+            <div class="input-section">
+                <h3>Ввод данных</h3>
+                <div class="form-group">
+                    <label for="cover-text-k">Текст-контейнер:</label>
+                    <textarea id="cover-text-k" placeholder="Введите текст, в который нужно скрыть сообщение..."></textarea>
+                    <button id="generate-cover-k" class="btn secondary" type="button">Сгенерировать контейнер</button>
+                </div>
+                <div class="form-group">
+                    <label for="secret-message-k">Секретное сообщение:</label>
+                    <textarea id="secret-message-k" placeholder="Введите сообщение для скрытия...">Секретное сообщение</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="kerning-value">Базовый кернинг (px):</label>
+                    <input type="number" id="kerning-value" value="0" min="-5" max="10">
+                </div>
+                <div class="form-group">
+                    <label for="modification-value-k">Величина модификации (px):</label>
+                    <input type="number" id="modification-value-k" value="1" min="1" max="5">
+                </div>
+                <button id="encode-k" class="btn primary">Закодировать</button>
+            </div>
+
+            <div class="output-section">
+                <h3>Результат</h3>
+                <div class="form-group">
+                    <label for="encoded-text-k">Закодированный текст:</label>
+                    <div id="encoded-text-k" class="output-text"></div>
+                </div>
+                <button id="decode-k" class="btn secondary">Декодировать</button>
+                <div class="form-group">
+                    <label for="decoded-message-k">Декодированное сообщение:</label>
+                    <div id="decoded-message-k" class="output-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab-content" id="line-length">
+            <div class="input-section">
+                <h3>Ввод данных</h3>
+                <div class="form-group">
+                    <label for="cover-text-ll">Текст-контейнер:</label>
+                    <textarea id="cover-text-ll" placeholder="Введите текст, в который нужно скрыть сообщение..."></textarea>
+                    <button id="generate-cover-ll" class="btn secondary" type="button">Сгенерировать контейнер</button>
+                </div>
+                <div class="form-group">
+                    <label for="secret-message-ll">Секретное сообщение:</label>
+                    <textarea id="secret-message-ll" placeholder="Введите сообщение для скрытия...">Секретное сообщение</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="line-length-value">Базовая длина строки (символов):</label>
+                    <input type="number" id="line-length-value" value="50" min="20" max="100">
+                </div>
+                <div class="form-group">
+                    <label for="modification-value-ll">Величина модификации (символов):</label>
+                    <input type="number" id="modification-value-ll" value="5" min="1" max="15">
+                </div>
+                <button id="encode-ll" class="btn primary">Закодировать</button>
+            </div>
+
+            <div class="output-section">
+                <h3>Результат</h3>
+                <div class="form-group">
+                    <label for="encoded-text-ll">Закодированный текст:</label>
+                    <div id="encoded-text-ll" class="output-text"></div>
+                </div>
+                <button id="decode-ll" class="btn secondary">Декодировать</button>
+                <div class="form-group">
+                    <label for="decoded-message-ll">Декодированное сообщение:</label>
+                    <div id="decoded-message-ll" class="output-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="info-section">
+            <h3>📚 Теоретическая информация</h3>
+            <div class="info-grid">
+                <div class="info-card">
+                    <h4>Модификация кернинга</h4>
+                    <p>Метод использует изменение расстояния между символами в тексте. Увеличенный кернинг кодирует '1', нормальный - '0'.</p>
+                </div>
+                <div class="info-card">
+                    <h4>Модификация длины строки</h4>
+                    <p>Метод основан на изменении длины строк текста. Увеличенная длина строки кодирует '1', нормальная - '0'. Эффективен для многострочных текстов.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-section">
+            <h3>📊 Анализ и статистика</h3>
+            <div class="analysis-grid">
+                <div class="analysis-card">
+                    <h4>Статистика кодирования</h4>
+                    <div id="encoding-stats" class="stats-content">
+                        <p>Закодируйте текст для просмотра статистики</p>
+                    </div>
+                </div>
+                <div class="analysis-card">
+                    <h4>Визуализация битов</h4>
+                    <div id="bit-visualization" class="bit-grid">
+                        <p>Закодируйте текст для просмотра битов</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
