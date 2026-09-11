@@ -1,0 +1,16 @@
+{
+  "name": "hash-performance-analyzer",
+  "version": "1.0.0",
+  "description": "SHA-256 Hashing Algorithm Performance Analyzer (Web)",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "nodemon app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  }
+} 

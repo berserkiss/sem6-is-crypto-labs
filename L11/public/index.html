@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Анализ производительности SHA-256</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin-bottom: 10px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .performance-results {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        #chart-container {
+            margin-top: 30px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            padding: 20px;
+        }
+    </style>
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Анализ производительности SHA-256</h1>
+        
+        <div class="input-group">
+            <h3>Входной текст</h3>
+            <textarea id="inputText" placeholder="Введите текст для хеширования..."></textarea>
+            <button onclick="hashInput()">Вычислить хеш</button>
+        </div>
+
+        <div class="input-group">
+            <h3>Тест производительности</h3>
+            <label>Начальная длина: <input type="number" id="startLength" value="10" min="1" style="width:80px"></label>
+            <label style="margin-left:10px;">Шаг: <input type="number" id="stepLength" value="10" min="1" style="width:80px"></label>
+            <label style="margin-left:10px;">Итераций: <input type="number" id="iterations" value="20" min="1" style="width:80px"></label>
+            <label style="margin-left:10px;">Замеров на точку: <input type="number" id="samples" value="5" min="1" style="width:80px"></label>
+            <button onclick="runPerformanceTest()">Запустить тест</button>
+        </div>
+
+        <div id="results">
+            <h3>Результаты</h3>
+            <div id="hashResult"></div>
+            <div id="performanceResult"></div>
+        </div>
+
+        <div class="performance-results">
+            <h3>Таблица производительности</h3>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>Итерация</th>
+                        <th>Длина входа</th>
+                        <th>Время выполнения (мс)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <div id="chart-container">
+            <h3>График времени хеширования</h3>
+            <canvas id="chart" width="700" height="300"></canvas>
+        </div>
+    </div>
+
+    <script>
+        let chartInstance = null;
+
+        async function hashInput() {
+            const input = document.getElementById('inputText').value;
+            const response = await fetch('/api/hash', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ input })
+            });
+            const result = await response.json();
+            document.getElementById('hashResult').innerHTML = `
+                <p><strong>Хеш:</strong> ${result.hash}</p>
+                <p><strong>Время выполнения:</strong> ${result.executionTime.toFixed(3)} мс</p>
+            `;
+        }
+
+        async function runPerformanceTest() {
+            const startLength = parseInt(document.getElementById('startLength').value);
+            const stepLength = parseInt(document.getElementById('stepLength').value);
+            const iterations = parseInt(document.getElementById('iterations').value);
+            const samples = parseInt(document.getElementById('samples').value);
+            const input = document.getElementById('inputText').value || 'a';
+            const response = await fetch('/api/performance', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ input, startLength, stepLength, iterations, samples })
+            });
+            const results = await response.json();
+            const tbody = document.querySelector('#resultsTable tbody');
+            tbody.innerHTML = '';
+            results.forEach(result => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = result.iteration;
+                row.insertCell(1).textContent = result.inputLength;
+                row.insertCell(2).textContent = result.executionTime.toFixed(3);
+            });
+            document.getElementById('performanceResult').innerHTML = '';
+            drawChart(results);
+        }
+
+        function drawChart(results) {
+            const ctx = document.getElementById('chart').getContext('2d');
+            const labels = results.map(r => r.inputLength.toLocaleString() + ' симв.');
+            const data = results.map(r => r.executionTime);
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Время хеширования',
+                        data: data,
+                        borderColor: 'rgba(128, 0, 192, 1)',
+                        backgroundColor: 'rgba(128, 0, 192, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: 'rgba(128, 0, 192, 1)',
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            labels: {
+                                font: { size: 16 }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Анализ производительности',
+                            font: { size: 22, weight: 'bold' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Длина входных данных',
+                                font: { size: 16, style: 'italic' }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Время выполнения (мс)',
+                                font: { size: 16, style: 'italic' }
+                            },
+                            beginAtZero: true,
+                            max: Math.max(...data) * 1.2
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html> 
